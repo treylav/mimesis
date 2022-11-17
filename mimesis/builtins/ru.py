@@ -1,6 +1,7 @@
 """Specific data provider for Russia (ru)."""
 
 import typing as t
+from time import strftime, localtime
 from datetime import datetime
 from warnings import warn
 
@@ -20,7 +21,8 @@ class RussiaSpecProvider(BaseSpecProvider):
         super().__init__(locale=Locale.RU, seed=seed)
         self._load_datafile(self._datafile)
         self._current_year = str(datetime.now().year)
-        # Local tax office code. Used in tax-related identifiers - KPP, INN, OGRN.
+        self._current_year_without_century: int = int(strftime("%y", localtime()))
+        # Local tax office code. Used in tax-related identifiers - KPP, INN.
         # Format: XXYY, where XX - code of Russian region, YY - ID of local tax office.
         # Tax offices on contested territories between Ukraine and Russia are not included.
         # The codes below are parsed from the public database of the Federal Tax Service.
@@ -3386,6 +3388,9 @@ class RussiaSpecProvider(BaseSpecProvider):
             "9957",
             "9958",
         )
+        self._all_russian_regions = list(range(1, 90))  # region codes of contested territories between Ukraine and Russia are not included.
+        self._all_russian_regions.pop(-2)  # there is no region with a code "88" in Russia.
+        self._region_code: str = f"{self.random.choice(self._all_russian_regions):02d}"
 
     class Meta:
         """The name of the provider."""
@@ -3517,6 +3522,11 @@ class RussiaSpecProvider(BaseSpecProvider):
         numbers.append(n1)
         return "".join(map(str, numbers))
 
+    def _generate_control_ogrn_digit(self, ogrn: str) -> str:
+        control_sum = int(ogrn) - int(ogrn) // 11 * 11
+        control_digit = str(control_sum)[-1]
+        return control_digit
+
     def ogrn(self) -> str:
         """Generate random valid ``OGRN``.
 
@@ -3525,14 +3535,30 @@ class RussiaSpecProvider(BaseSpecProvider):
         :Example:
             4715113303725.
         """
-        numbers = []
-        for _ in range(0, 12):
-            numbers.append(self.random.randint(1 if _ == 0 else 0, 9))
+        registration_reason_codes: t.Final[t.Sequence[str]] = ("1", "5")
+        registration_reason: str = self.random.choice((registration_reason_codes))
+        registration_year: str = f"{self.random.randint(0, self._current_year_without_century):02d}"
+        local_tax_office_code: str = self.random.choice(self._tax_office_codes)
+        index: str = f"{self.random.randint(1, 99999):05d}"
+        ogrn_without_control_digit: str = f"{registration_reason}{registration_year}{local_tax_office_code}{index}"
+        control_digit: str = self._generate_control_ogrn_digit(ogrn_without_control_digit)
 
-        ogrn = "".join(map(str, numbers))
-        check_sum = str(int(ogrn) % 11 % 10)
+        return f"{ogrn_without_control_digit}{control_digit}"
 
-        return f"{ogrn}{check_sum}"
+    def _generate_control_orgnip_digit(self, ogrnip: str) -> str:
+        control_sum = int(ogrnip) - int(ogrnip) // 13 * 13
+        control_digit = str(control_sum)[-1]
+        return control_digit
+
+    def ogrnip(self) -> str:
+        registration_reason: str = "3"
+        registration_year: str = f"{self.random.randint(0, self._current_year_without_century):02d}"
+        region_code: str = self._region_code
+        index: str = f"{self.random.randint(1, 999999999):09d}"
+        ogrnip_without_control_digit: str = f"{registration_reason}{registration_year}{region_code}{index}"
+        control_digit: str = self._generate_control_orgnip_digit(ogrnip_without_control_digit)
+
+        return f"{ogrnip_without_control_digit}{control_digit}"
 
     def bic(self) -> str:
         """Generate random ``BIC`` (Bank ID Code).
