@@ -1,8 +1,8 @@
 """Specific data provider for Russia (ru)."""
 
 import typing as t
-from time import strftime, localtime
 from datetime import datetime
+from time import localtime, strftime
 from warnings import warn
 
 from mimesis.builtins.base import BaseSpecProvider
@@ -3389,7 +3389,7 @@ class RussiaSpecProvider(BaseSpecProvider):
             "9958",
         )
         self._all_russian_regions = list(range(1, 90))  # region codes of contested territories between Ukraine and Russia are not included.
-        self._all_russian_regions.pop(-2)  # there is no region with a code "88" in Russia.
+        self._all_russian_regions.remove(88)  # there is no region with a code "88" in Russia.
         self._region_code: str = f"{self.random.choice(self._all_russian_regions):02d}"
 
     class Meta:
