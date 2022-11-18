@@ -66,9 +66,28 @@ def test_inn(russia):
     assert result is not None
 
 
-def test_ogrn(russia):
+def test_ogrn_length(russia):
     result = russia.ogrn()
     assert len(result) == 13
+
+
+@pytest.mark.parametrize(
+    "sample, result",
+    [
+        ("103770001302", "0"),  # Bank Of Russia
+        ("102770007051", "8"),  # Gazprom
+        ("102770013219", "5"),  # Sberbank
+        ("102773985096", "2"),  # VK
+        ("102770022919", "3"),  # Yandex
+    ],
+)
+def test_ogrn_control_digit(russia, sample, result):
+    assert russia._generate_control_ogrn_digit(sample) == result
+
+
+def test_ornip(russia):
+    result = russia.ogrnip()
+    assert len(result) == 15
 
 
 def test_bic(russia):
