@@ -8,6 +8,22 @@ from mimesis.exceptions import NonEnumerableError
 def russia():
     return RussiaSpecProvider()
 
+@pytest.mark.parametrize(
+    "first_issue, last_issue, result",
+    [
+        (1988, 1990, [88, 89, 90]),
+        (1999, 2001, [99, 0, 1]),
+        (1788, 1788, [88]),
+        (99, 2022, list(range(0, 100)))
+    ],
+)
+def test_possible_years_of_issue(russia, first_issue, last_issue, result):
+    assert russia._get_possible_years_of_issue(first_issue, last_issue) == result
+
+
+def test_invalid_possible_years_of_issue(russia):
+    with pytest.raises(ValueError):
+        russia._get_possible_years_of_issue(1818, 1817)
 
 def test_passport_series(russia):
     series = russia.passport_series()
