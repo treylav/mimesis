@@ -105,11 +105,11 @@ def test_ogrn_control_digit(russia, sample, result):
 
 def test_ogrnip_control_digit(russia):
     assert (
-        russia._generate_control_orgnip_digit("31453313670018") == "6"
-    )  # Personal ORGNIP of committer
+        russia._generate_control_ogrnip_digit("31453313670018") == "6"
+    )  # personal ORGNIP of committer.
 
 
-def test_ornip_length(russia):
+def test_ogrnip_length(russia):
     result = russia.ogrnip()
     assert len(result) == 15
 

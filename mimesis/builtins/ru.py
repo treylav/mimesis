@@ -3615,7 +3615,7 @@ class RussiaSpecProvider(BaseSpecProvider):
 
         return f"{ogrn_without_control_digit}{control_digit}"
 
-    def _generate_control_orgnip_digit(self, ogrnip: str) -> str:
+    def _generate_control_ogrnip_digit(self, ogrnip: str) -> str:
         control_sum = int(ogrnip) - int(ogrnip) // 13 * 13
         control_digit = str(control_sum)[-1]
         return control_digit
@@ -3633,7 +3633,7 @@ class RussiaSpecProvider(BaseSpecProvider):
         ogrnip_without_control_digit: str = (
             f"{registration_reason}{registration_year}{region_code}{index}"
         )
-        control_digit: str = self._generate_control_orgnip_digit(
+        control_digit: str = self._generate_control_ogrnip_digit(
             ogrnip_without_control_digit
         )
 
