@@ -8,13 +8,14 @@ from mimesis.exceptions import NonEnumerableError
 def russia():
     return RussiaSpecProvider()
 
+
 @pytest.mark.parametrize(
     "first_issue, last_issue, result",
     [
         (1988, 1990, [88, 89, 90]),
         (1999, 2001, [99, 0, 1]),
         (1788, 1788, [88]),
-        (99, 2022, list(range(0, 100)))
+        (99, 2022, list(range(0, 100))),
     ],
 )
 def test_possible_years_of_issue(russia, first_issue, last_issue, result):
@@ -24,6 +25,7 @@ def test_possible_years_of_issue(russia, first_issue, last_issue, result):
 def test_invalid_possible_years_of_issue(russia):
     with pytest.raises(ValueError):
         russia._get_possible_years_of_issue(1818, 1817)
+
 
 def test_passport_series(russia):
     series = russia.passport_series()
@@ -101,7 +103,13 @@ def test_ogrn_control_digit(russia, sample, result):
     assert russia._generate_control_ogrn_digit(sample) == result
 
 
-def test_ornip(russia):
+def test_ogrnip_control_digit(russia):
+    assert (
+        russia._generate_control_orgnip_digit("31453313670018") == "6"
+    )  # Personal ORGNIP of committer
+
+
+def test_ornip_length(russia):
     result = russia.ogrnip()
     assert len(result) == 15
 
