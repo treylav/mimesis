@@ -3398,9 +3398,20 @@ class RussiaSpecProvider(BaseSpecProvider):
 
         name: t.Final[str] = "russia_provider"
 
-    def _get_possible_years_of_issue(
+    def _get_years_of_issue(
         self, year_of_first_issue: int, year_of_last_issue: int = datetime.now().year
     ) -> t.List[int]:
+        """Get the possible years of issue of the ID.
+        Many Russian IDs include the last two digits of the year of issue.
+        Thus, a document issued from 1999 to 2002 may have 99, 00, 01, 02 as the year.
+
+        :param year_of_first_issue: Year of the fist issue of this ID.
+        :param year_of_last_issue: Year of last issue of this ID.
+        If not specified, the ID is considered to be still being issued.
+        :return: List of possible year-related parts of ID as two-digits ints.
+        :example:
+            [99, 00, 01, 02]
+        """
         first_issue_two_leading_digits: int = year_of_first_issue // 100
         last_issue_two_leading_digits: int = year_of_last_issue // 100
         first_issue_last_two_digits: int = year_of_first_issue % 100
@@ -3548,6 +3559,14 @@ class RussiaSpecProvider(BaseSpecProvider):
         return "".join(map(str, numbers))
 
     def _generate_control_ogrn_digit(self, ogrn: str) -> str:
+        """Generate control (13th) digit of OGNR based on the previous 12.
+
+        :param ogrn: String of 12 ints from self.ogrn function.
+        :return: Control digit as string.
+
+        example:
+            5
+        """
         control_sum = int(ogrn) - int(ogrn) // 11 * 11
         control_digit = str(control_sum)[-1]
         return control_digit
@@ -3557,12 +3576,21 @@ class RussiaSpecProvider(BaseSpecProvider):
         include_private_organization: bool = True,
         include_state_organizations: bool = True,
     ) -> str:
-        """Generate random valid ``OGRN``.
+        """Generate random valid ``OGRN``. OGRN is main ID for any organization in Russia.
+        Format - 13 digits, TZZXXYYNNNNNC, where:
+        - T — "registration reason code", depends on the founder of the organization - individuals or the state structures;
+        - ZZ - last two digits of the year of registration (_get_years_of_issue);
+        - XX - code of Russian region (self._tax_office_codes);
+        - YY - ID of local tax office (self._tax_office_codes);
+        - NNNN - index among organizations with same TZZXXYY codes;
+        - C - control digit (self._generate_control_ogrn_digit).
 
-        :return: OGRN.
+        :param include_private_organization: Will registration reason codes for private organizations be included or not.
+        :param include_state_organizations: Will registration reason codes for state organizations be included or not.
+        :return: OGRN as a string of 13 digits.
 
         :Example:
-            4715113303725.
+            6171435149022.
         """
         registration_reason_codes_for_private_organizations: t.Final[
             t.Sequence[str]
@@ -3597,7 +3625,7 @@ class RussiaSpecProvider(BaseSpecProvider):
             )
 
         registration_reason: str = self.random.choice(registration_reason_codes)
-        registration_year: str = f"{self.random.choice(self._get_possible_years_of_issue(year_of_first_issue=2002)):02d}"
+        registration_year: str = f"{self.random.choice(self._get_years_of_issue(year_of_first_issue=2002)):02d}"
         local_tax_office_code: str = self.random.choice(self._tax_office_codes)
         index: str = f"{self.random.randint(1, 99999):05d}"
         ogrn_without_control_digit: str = (
@@ -3610,13 +3638,31 @@ class RussiaSpecProvider(BaseSpecProvider):
         return f"{ogrn_without_control_digit}{control_digit}"
 
     def _generate_control_ogrnip_digit(self, ogrnip: str) -> str:
+        """Generate control (15th) digit of OGNRIP based on the previous 14.
+
+        :param ogrn: String of 14 ints from self.ogrnip function.
+        :return: Control digit as string.
+
+        example:
+            4
+        """
         control_sum = int(ogrnip) - int(ogrnip) // 13 * 13
         control_digit = str(control_sum)[-1]
         return control_digit
 
     def ogrnip(self) -> str:
+        """Generate random valid ``OGRNIP``. OGRNIP is Russian ID for analogue sole proprietorship, individual business.
+        Format - 15 digits, TZZXXNNNNNNNNNC, where:
+        - T — "registration reason code" which means "individual business";
+        - ZZ - last two digits of the year of registration (_get_years_of_issue);
+        - XX - code of Russian region (self._tax_office_codes);
+        - NNNNNNNNN - index among organizations with same TZZXXYY codes;
+        - C - control digit (self._generate_control_ogrnip_digit).
+        example:
+            315462340283350
+        """
         registration_reason: str = "3"
-        registration_year: str = f"{self.random.choice(self._get_possible_years_of_issue(year_of_first_issue=2002)):02d}"
+        registration_year: str = f"{self.random.choice(self._get_years_of_issue(year_of_first_issue=2002)):02d}"
         region_code: str = f"{self.random.choice(self._all_russian_regions):02d}"
         index: str = f"{self.random.randint(1, 999999999):09d}"
         ogrnip_without_control_digit: str = (
