@@ -3426,12 +3426,12 @@ class RussiaSpecProvider(BaseSpecProvider):
             return list(range(0, 100))
         elif first_issue_two_leading_digits == last_issue_two_leading_digits:
             return list(
-                range(first_issue_last_two_digits, last_issue_last_two_digits + 1)
+                range(first_issue_last_two_digits, last_issue_last_two_digits + 1)  # "+1" because range doesn't include the last number itself.
             )
         elif first_issue_two_leading_digits < last_issue_two_leading_digits:
             two_ranges: t.List[int] = []
             two_ranges.extend(range(first_issue_last_two_digits, 100))
-            two_ranges.extend(range(0, last_issue_last_two_digits + 1))
+            two_ranges.extend(range(0, last_issue_last_two_digits + 1))  # "+1" because range doesn't include the last number itself.
             return two_ranges
 
     def generate_sentence(self) -> str:
