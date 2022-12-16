@@ -3386,13 +3386,12 @@ class RussiaSpecProvider(BaseSpecProvider):
             "9957",
             "9958",
         )
-        self._all_russian_regions = list(
+        self._all_russian_regions: t.List[int] = list(
             range(1, 90)
         )  # region codes of contested territories between Ukraine and Russia are not included.
         self._all_russian_regions.remove(
             88
         )  # there is no region with a code "88" in Russia.
-        self._region_code: str = f"{self.random.choice(self._all_russian_regions):02d}"
 
     class Meta:
         """The name of the provider."""
@@ -3402,10 +3401,10 @@ class RussiaSpecProvider(BaseSpecProvider):
     def _get_possible_years_of_issue(
         self, year_of_first_issue: int, year_of_last_issue: int = datetime.now().year
     ) -> t.List[int]:
-        first_issue_two_leading_digits = year_of_first_issue // 100
-        last_issue_two_leading_digits = year_of_last_issue // 100
-        first_issue_without_century = year_of_first_issue % 100
-        last_issue_without_century = year_of_last_issue % 100
+        first_issue_two_leading_digits: int = year_of_first_issue // 100
+        last_issue_two_leading_digits: int = year_of_last_issue // 100
+        first_issue_last_two_digits: int = year_of_first_issue % 100
+        last_issue_last_two_digits: int = year_of_last_issue % 100
 
         if year_of_first_issue > year_of_last_issue:
             raise ValueError(
@@ -3415,12 +3414,12 @@ class RussiaSpecProvider(BaseSpecProvider):
             return list(range(0, 100))
         elif first_issue_two_leading_digits == last_issue_two_leading_digits:
             return list(
-                range(first_issue_without_century, last_issue_without_century + 1)
+                range(first_issue_last_two_digits, last_issue_last_two_digits + 1)
             )
         elif first_issue_two_leading_digits < last_issue_two_leading_digits:
             two_ranges: t.List[int] = []
-            two_ranges.extend(range(first_issue_without_century, 100))
-            two_ranges.extend(range(0, last_issue_without_century + 1))
+            two_ranges.extend(range(first_issue_last_two_digits, 100))
+            two_ranges.extend(range(0, last_issue_last_two_digits + 1))
             return two_ranges
 
     def generate_sentence(self) -> str:
@@ -3597,13 +3596,8 @@ class RussiaSpecProvider(BaseSpecProvider):
                 registration_reason_code_for_state_organizations
             )
 
-        registration_reason: str = self.random.choice((registration_reason_codes))
-        registration_possible_years: t.Sequence[
-            int
-        ] = self._get_possible_years_of_issue(year_of_first_issue=2002)
-        registration_year: str = (
-            f"{self.random.choice(registration_possible_years):02d}"
-        )
+        registration_reason: str = self.random.choice(registration_reason_codes)
+        registration_year: str = f"{self.random.choice(self._get_possible_years_of_issue(year_of_first_issue=2002)):02d}"
         local_tax_office_code: str = self.random.choice(self._tax_office_codes)
         index: str = f"{self.random.randint(1, 99999):05d}"
         ogrn_without_control_digit: str = (
@@ -3622,13 +3616,8 @@ class RussiaSpecProvider(BaseSpecProvider):
 
     def ogrnip(self) -> str:
         registration_reason: str = "3"
-        registration_possible_years: t.Sequence[
-            int
-        ] = self._get_possible_years_of_issue(year_of_first_issue=2002)
-        registration_year: str = (
-            f"{self.random.choice(registration_possible_years):02d}"
-        )
-        region_code: str = self._region_code
+        registration_year: str = f"{self.random.choice(self._get_possible_years_of_issue(year_of_first_issue=2002)):02d}"
+        region_code: str = f"{self.random.choice(self._all_russian_regions):02d}"
         index: str = f"{self.random.randint(1, 999999999):09d}"
         ogrnip_without_control_digit: str = (
             f"{registration_reason}{registration_year}{region_code}{index}"

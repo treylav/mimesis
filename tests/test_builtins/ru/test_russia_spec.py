@@ -19,12 +19,12 @@ def russia():
     ],
 )
 def test_possible_years_of_issue(russia, first_issue, last_issue, result):
-    assert russia._get_possible_years_of_issue(first_issue, last_issue) == result
+    assert russia._get_years_of_issue(first_issue, last_issue) == result
 
 
 def test_invalid_possible_years_of_issue(russia):
     with pytest.raises(ValueError):
-        russia._get_possible_years_of_issue(1818, 1817)
+        russia._get_years_of_issue(1818, 1817)
 
 
 def test_passport_series(russia):
