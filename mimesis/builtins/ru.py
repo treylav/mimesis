@@ -3409,7 +3409,8 @@ class RussiaSpecProvider(BaseSpecProvider):
         :param year_of_last_issue: Year of last issue of this ID.
         If not specified, the ID is considered to be still being issued.
         :return: List of possible year-related parts of ID as two-digits ints.
-        :example:
+
+        :Example:
             [99, 00, 01, 02]
         """
         first_issue_two_leading_digits: int = year_of_first_issue // 100
@@ -3564,7 +3565,7 @@ class RussiaSpecProvider(BaseSpecProvider):
         :param ogrn: String of 12 ints from self.ogrn function.
         :return: Control digit as string.
 
-        example:
+        Example:
             5
         """
         control_sum = int(ogrn) - int(ogrn) // 11 * 11
@@ -3640,7 +3641,7 @@ class RussiaSpecProvider(BaseSpecProvider):
     def _generate_control_ogrnip_digit(self, ogrnip: str) -> str:
         """Generate control (15th) digit of OGNRIP based on the previous 14.
 
-        :param ogrn: String of 14 ints from self.ogrnip function.
+        :param ogrnip: String of 14 ints from self.ogrnip function.
         :return: Control digit as string.
 
         example:
@@ -3658,7 +3659,8 @@ class RussiaSpecProvider(BaseSpecProvider):
         - XX - code of Russian region (self._tax_office_codes);
         - NNNNNNNNN - index among organizations with same TZZXXYY codes;
         - C - control digit (self._generate_control_ogrnip_digit).
-        example:
+
+        :Example:
             315462340283350
         """
         registration_reason: str = "3"
@@ -3704,6 +3706,7 @@ class RussiaSpecProvider(BaseSpecProvider):
         KPP does not have way to be validated by itself, such as a check digit.
 
         :return: 'KPP'.
+
         :Example:
             560058652.
         """
