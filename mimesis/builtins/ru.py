@@ -3386,12 +3386,92 @@ class RussiaSpecProvider(BaseSpecProvider):
             "9957",
             "9958",
         )
-        self._all_russian_regions: t.List[int] = list(
-            range(1, 90)
-        )  # region codes of contested territories between Ukraine and Russia are not included.
-        self._all_russian_regions.remove(
-            88
-        )  # there is no region with a code "88" in Russia.
+        self._region_codes: t.Final[t.Sequence[str]] = (
+            "01",
+            "02",
+            "03",
+            "04",
+            "05",
+            "06",
+            "07",
+            "08",
+            "09",
+            "10",
+            "11",
+            "12",
+            "13",
+            "14",
+            "15",
+            "16",
+            "17",
+            "18",
+            "19",
+            "20",
+            "21",
+            "22",
+            "23",
+            "24",
+            "25",
+            "26",
+            "27",
+            "28",
+            "29",
+            "30",
+            "31",
+            "32",
+            "33",
+            "34",
+            "35",
+            "36",
+            "37",
+            "38",
+            "39",
+            "40",
+            "41",
+            "42",
+            "43",
+            "44",
+            "45",
+            "46",
+            "47",
+            "48",
+            "49",
+            "50",
+            "51",
+            "52",
+            "53",
+            "54",
+            "55",
+            "56",
+            "57",
+            "58",
+            "59",
+            "60",
+            "61",
+            "62",
+            "63",
+            "64",
+            "65",
+            "66",
+            "67",
+            "68",
+            "69",
+            "70",
+            "71",
+            "72",
+            "73",
+            "74",
+            "75",
+            "76",
+            "77",
+            "78",
+            "79",
+            "83",
+            "86",
+            "87",
+            "89",
+            "99",
+        )
 
     class Meta:
         """The name of the provider."""
@@ -3426,12 +3506,16 @@ class RussiaSpecProvider(BaseSpecProvider):
             return list(range(0, 100))
         elif first_issue_two_leading_digits == last_issue_two_leading_digits:
             return list(
-                range(first_issue_last_two_digits, last_issue_last_two_digits + 1)  # "+1" because range doesn't include the last number itself.
+                range(
+                    first_issue_last_two_digits, last_issue_last_two_digits + 1
+                )  # "+1" because range doesn't include the last number itself.
             )
         elif first_issue_two_leading_digits < last_issue_two_leading_digits:
             two_ranges: t.List[int] = []
             two_ranges.extend(range(first_issue_last_two_digits, 100))
-            two_ranges.extend(range(0, last_issue_last_two_digits + 1))  # "+1" because range doesn't include the last number itself.
+            two_ranges.extend(
+                range(0, last_issue_last_two_digits + 1)
+            )  # "+1" because range doesn't include the last number itself.
             return two_ranges
 
     def generate_sentence(self) -> str:
@@ -3665,7 +3749,7 @@ class RussiaSpecProvider(BaseSpecProvider):
         """
         registration_reason: str = "3"
         registration_year: str = f"{self.random.choice(self._get_years_of_issue(year_of_first_issue=2002)):02d}"
-        region_code: str = f"{self.random.choice(self._all_russian_regions):02d}"
+        region_code: str = self.random.choice(self._region_codes)
         index: str = f"{self.random.randint(1, 999999999):09d}"
         ogrnip_without_control_digit: str = (
             f"{registration_reason}{registration_year}{region_code}{index}"
